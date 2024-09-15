@@ -17,14 +17,14 @@ import (
 type calc struct {
 	equation string
 
-	output  *widget.Label
+	output  *widget.RichText
 	buttons map[string]*widget.Button
 	window  fyne.Window
 }
 
 func (c *calc) display(newtext string) {
 	c.equation = newtext
-	c.output.SetText(newtext)
+	c.output.ParseMarkdown(newtext)
 }
 
 func (c *calc) character(char rune) {
@@ -51,12 +51,12 @@ func (c *calc) backspace() {
 }
 
 func (c *calc) evaluate() {
-	if strings.Contains(c.output.Text, "error") {
+	if strings.Contains(c.output.String(), "error") {
 		c.display("error")
 		return
 	}
 
-	expression, err := govaluate.NewEvaluableExpression(c.output.Text)
+	expression, err := govaluate.NewEvaluableExpression(c.output.String())
 	if err != nil {
 		log.Println("Error in calculation", err)
 		c.display("error")
@@ -72,7 +72,7 @@ func (c *calc) evaluate() {
 
 	value, ok := result.(float64)
 	if !ok {
-		log.Println("Invalid input:", c.output.Text)
+		log.Println("Invalid input:", c.output.String())
 		c.display("error")
 		return
 	}
@@ -131,8 +131,7 @@ func (c *calc) onCopyShortcut(shortcut fyne.Shortcut) {
 }
 
 func (c *calc) loadUI(app fyne.App) {
-	c.output = &widget.Label{Alignment: fyne.TextAlignTrailing}
-	c.output.TextStyle.Monospace = true
+	c.output = &widget.RichText{}
 
 	equals := c.addButton("=", c.evaluate)
 	equals.Importance = widget.HighImportance

@@ -16,15 +16,25 @@ import (
 
 type calc struct {
 	equation string
+	position int
 
 	output  *widget.RichText
 	buttons map[string]*widget.Button
 	window  fyne.Window
 }
 
+func (c *calc) add_mark_on_position(newtext string) string {
+	if len(newtext)==0 {
+		return newtext
+	} else {
+		space := len(newtext)-1-c.position
+		return newtext[0:space]+"["+newtext[space:space+1]+"](#)"+newtext[space+1:]
+	}
+}
+
 func (c *calc) display(newtext string) {
 	c.equation = newtext
-	c.output.ParseMarkdown(newtext)
+	c.output.ParseMarkdown(c.add_mark_on_position(newtext))
 }
 
 func (c *calc) character(char rune) {
@@ -56,7 +66,7 @@ func (c *calc) evaluate() {
 		return
 	}
 
-	expression, err := govaluate.NewEvaluableExpression(c.output.String())
+	expression, err := govaluate.NewEvaluableExpression(c.equation)
 	if err != nil {
 		log.Println("Error in calculation", err)
 		c.display("error")
@@ -72,7 +82,7 @@ func (c *calc) evaluate() {
 
 	value, ok := result.(float64)
 	if !ok {
-		log.Println("Invalid input:", c.output.String())
+		log.Println("Invalid input:", c.equation)
 		c.display("error")
 		return
 	}
@@ -177,6 +187,7 @@ func (c *calc) loadUI(app fyne.App) {
 
 func newCalculator() *calc {
 	return &calc{
+                position: 0,
 		buttons: make(map[string]*widget.Button, 19),
 	}
 }

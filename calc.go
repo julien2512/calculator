@@ -23,6 +23,14 @@ type calc struct {
 	window  fyne.Window
 }
 
+func remove_asterisk(newtext string) string {
+	return strings.Replace(newtext, "*", "x", -1)
+}
+
+func giveback_asterisk(newtext string) string {
+	return strings.Replace(newtext, "x", "*", -1)
+}
+
 func (c *calc) add_mark_on_position(newtext string) string {
 	if len(newtext)==0 {
 		return newtext
@@ -33,8 +41,8 @@ func (c *calc) add_mark_on_position(newtext string) string {
 }
 
 func (c *calc) display(newtext string) {
-	c.equation = newtext
-	c.output.ParseMarkdown(c.add_mark_on_position(newtext))
+	c.equation = remove_asterisk(newtext)
+	c.output.ParseMarkdown(c.add_mark_on_position(c.equation))
 }
 
 func (c *calc) character(char rune) {
@@ -66,7 +74,7 @@ func (c *calc) evaluate() {
 		return
 	}
 
-	expression, err := govaluate.NewEvaluableExpression(c.equation)
+	expression, err := govaluate.NewEvaluableExpression(giveback_asterisk(c.equation))
 	if err != nil {
 		log.Println("Error in calculation", err)
 		c.display("error")

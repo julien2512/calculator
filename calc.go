@@ -57,6 +57,24 @@ func (c *calc) clear() {
 	c.display("")
 }
 
+func (c *calc) right() {
+	if len(c.equation) == 0 {
+		return
+	} else if c.position>0 {
+		c.position = c.position-1
+		c.display(c.equation)
+	}
+}
+
+func (c *calc) left() {
+	if len(c.equation) == 0 {
+		return
+	} else if c.position<len(c.equation)-1 {
+		c.position = c.position+1
+		c.display(c.equation)
+	}
+}
+
 func (c *calc) backspace() {
 	if len(c.equation) == 0 {
 		return
@@ -69,6 +87,7 @@ func (c *calc) backspace() {
 }
 
 func (c *calc) evaluate() {
+	c.position = 0
 	if strings.Contains(c.output.String(), "error") {
 		c.display("error")
 		return
@@ -132,6 +151,10 @@ func (c *calc) onTypedKey(ev *fyne.KeyEvent) {
 		c.evaluate()
 	} else if ev.Name == fyne.KeyBackspace {
 		c.backspace()
+	} else if ev.Name == fyne.KeyLeft {
+		c.left()
+	} else if ev.Name == fyne.KeyRight {
+		c.right()
 	}
 }
 

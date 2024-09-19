@@ -81,9 +81,13 @@ func (c *calc) backspace() {
 	} else if c.equation == "error" {
 		c.clear()
 		return
+	} else if len(c.equation) == 1 {
+		c.display("")
+		return
 	}
 
-	c.display(c.equation[:len(c.equation)-1])
+	space := len(c.equation)-1-c.position
+	c.display(c.equation[0:space]+c.equation[space+1:])
 }
 
 func (c *calc) evaluate() {

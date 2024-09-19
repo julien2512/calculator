@@ -35,6 +35,9 @@ func (c *calc) add_mark_on_position(newtext string) string {
 	if len(newtext)==0 {
 		return newtext
 	} else {
+		if c.position == len(newtext) {
+			c.position = c.position - 1
+		}
 		space := len(newtext)-1-c.position
 		return newtext[0:space]+"["+newtext[space:space+1]+"](#)"+newtext[space+1:]
 	}
@@ -46,7 +49,13 @@ func (c *calc) display(newtext string) {
 }
 
 func (c *calc) character(char rune) {
-	c.display(c.equation + string(char))
+	if len(c.equation) == 0 {
+		c.display(string(char))
+		return
+	}
+
+	space := len(c.equation)-1-c.position
+	c.display(c.equation[0:space]+c.equation[space:space+1]+string(char)+c.equation[space+1:])
 }
 
 func (c *calc) digit(d int) {
